@@ -2,7 +2,7 @@
   "version": 2,
   "builds": [
     {
-      "src": "backend/core/wsgi.py",
+      "src": "backend/vercel_app.py",
       "use": "@vercel/python",
       "config": { "runtime": "python3.9" }
     },
@@ -15,8 +15,9 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "backend/core/wsgi.py"
+      "dest": "backend/vercel_app.py"
     },
+
     {
       "src": "/assets/(.*)",
       "dest": "/frontend/assets/$1"
