@@ -16,7 +16,10 @@ class CalculateTripView(APIView):
             def geocode(addr):
                 url = f"https://nominatim.openstreetmap.org/search?q={addr}&format=json&limit=1"
                 headers = {'User-Agent': 'TruckFlowELD_Assessment_App/1.0 (contact: test@example.com)'}
-                res = requests.get(url, headers=headers).json()
+                response = requests.get(url, headers=headers)
+                if response.status_code != 200:
+                    raise Exception(f"Geocoding API Error ({response.status_code}): {response.text[:100]}")
+                res = response.json()
                 if not res:
                     raise Exception(f"Could not find location: {addr}")
                 return {"lat": float(res[0]['lat']), "lon": float(res[0]['lon']), "display_name": res[0]['display_name']}
@@ -28,10 +31,12 @@ class CalculateTripView(APIView):
             }
             
             # 2. Get Route from OSRM
-            # Route from current -> pickup -> dropoff
             coords = f"{locs['current']['lon']},{locs['current']['lat']};{locs['pickup']['lon']},{locs['pickup']['lat']};{locs['dropoff']['lon']},{locs['dropoff']['lat']}"
             osrm_url = f"https://router.project-osrm.org/route/v1/driving/{coords}?overview=full&geometries=geojson"
-            route_res = requests.get(osrm_url).json()
+            response = requests.get(osrm_url)
+            if response.status_code != 200:
+                 raise Exception(f"Routing API Error ({response.status_code}): {response.text[:100]}")
+            route_res = response.json()
             
             if route_res['code'] != 'Ok':
                  return Response({"error": "Routing failed"}, status=status.HTTP_400_BAD_REQUEST)
