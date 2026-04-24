@@ -14,24 +14,21 @@ class CalculateTripView(APIView):
         try:
             # 1. Geocode locations
             def geocode(addr):
-                # Use Photon (Komoot) as it's more permissive than Nominatim for demos
-                url = f"https://photon.komoot.io/api/?q={addr}&limit=1"
+                # Switch to ArcGIS public geocoder as it's very robust and less likely to block Vercel
+                url = f"https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=json&singleLine={addr}&maxLocations=1"
                 response = requests.get(url)
                 if response.status_code != 200:
                     raise Exception(f"Geocoding API Error ({response.status_code}): {response.text[:100]}")
                 res = response.json()
-                if not res.get('features'):
+                if not res.get('candidates'):
                     raise Exception(f"Could not find location: {addr}")
                 
-                feature = res['features'][0]
-                lon, lat = feature['geometry']['coordinates']
-                display_name = feature['properties'].get('name', addr)
-                if feature['properties'].get('city'):
-                    display_name += f", {feature['properties']['city']}"
-                if feature['properties'].get('country'):
-                    display_name += f", {feature['properties']['country']}"
-                    
-                return {"lat": lat, "lon": lon, "display_name": display_name}
+                candidate = res['candidates'][0]
+                return {
+                    "lat": candidate['location']['y'], 
+                    "lon": candidate['location']['x'], 
+                    "display_name": candidate['address']
+                }
 
             locs = {
                 "current": geocode(current_loc),
