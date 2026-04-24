@@ -30,7 +30,7 @@ class CalculateTripView(APIView):
             # 2. Get Route from OSRM
             # Route from current -> pickup -> dropoff
             coords = f"{locs['current']['lon']},{locs['current']['lat']};{locs['pickup']['lon']},{locs['pickup']['lat']};{locs['dropoff']['lon']},{locs['dropoff']['lat']}"
-            osrm_url = f"http://router.project-osrm.org/route/v1/driving/{coords}?overview=full&geometries=geojson"
+            osrm_url = f"https://router.project-osrm.org/route/v1/driving/{coords}?overview=full&geometries=geojson"
             route_res = requests.get(osrm_url).json()
             
             if route_res['code'] != 'Ok':

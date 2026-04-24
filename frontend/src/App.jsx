@@ -23,7 +23,9 @@ function App() {
       const response = await axios.post(`${API_BASE}/calculate/`, formData);
       setData(response.data);
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to calculate trip. Check addresses and try again.');
+      console.error('Trip calculation error:', err);
+      const detail = err.response?.data?.error || err.message;
+      setError(`Calculation failed: ${detail}`);
     } finally {
       setLoading(false);
     }
