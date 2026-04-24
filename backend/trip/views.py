@@ -14,15 +14,24 @@ class CalculateTripView(APIView):
         try:
             # 1. Geocode locations
             def geocode(addr):
-                url = f"https://nominatim.openstreetmap.org/search?q={addr}&format=json&limit=1"
-                headers = {'User-Agent': 'TruckFlowELD_Assessment_App/1.0 (contact: test@example.com)'}
-                response = requests.get(url, headers=headers)
+                # Use Photon (Komoot) as it's more permissive than Nominatim for demos
+                url = f"https://photon.komoot.io/api/?q={addr}&limit=1"
+                response = requests.get(url)
                 if response.status_code != 200:
                     raise Exception(f"Geocoding API Error ({response.status_code}): {response.text[:100]}")
                 res = response.json()
-                if not res:
+                if not res.get('features'):
                     raise Exception(f"Could not find location: {addr}")
-                return {"lat": float(res[0]['lat']), "lon": float(res[0]['lon']), "display_name": res[0]['display_name']}
+                
+                feature = res['features'][0]
+                lon, lat = feature['geometry']['coordinates']
+                display_name = feature['properties'].get('name', addr)
+                if feature['properties'].get('city'):
+                    display_name += f", {feature['properties']['city']}"
+                if feature['properties'].get('country'):
+                    display_name += f", {feature['properties']['country']}"
+                    
+                return {"lat": lat, "lon": lon, "display_name": display_name}
 
             locs = {
                 "current": geocode(current_loc),
