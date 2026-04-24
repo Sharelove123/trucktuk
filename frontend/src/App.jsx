@@ -7,7 +7,9 @@ import './styles/App.css';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
-const API_BASE = 'http://localhost:8000/api';
+const API_BASE = window.location.hostname === 'localhost' 
+  ? 'http://localhost:8000/api' 
+  : '/_/backend/api';
 
 function App() {
   const [data, setData] = useState(null);
