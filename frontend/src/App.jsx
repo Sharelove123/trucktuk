@@ -7,7 +7,7 @@ import './styles/App.css';
 
 import { motion, AnimatePresence } from 'framer-motion';
 
-const API_BASE = window.location.hostname === 'localhost' 
+const API_BASE = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ? 'http://localhost:8000/api' 
   : '/_/backend/api';
 
@@ -23,7 +23,11 @@ function App() {
       const response = await axios.post(`${API_BASE}/calculate/`, formData);
       setData(response.data);
     } catch (err) {
-      console.error('Trip calculation error:', err);
+      console.error('Full error object:', err);
+      if (err.response) {
+        console.error('Response data:', err.response.data);
+        console.error('Response status:', err.response.status);
+      }
       const detail = err.response?.data?.error || err.message;
       setError(`Calculation failed: ${detail}`);
     } finally {
