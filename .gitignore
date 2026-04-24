@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+db.sqlite3
+*.log
+
+# Node
+node_modules/
+dist/
+.DS_Store
+package-lock.json
+
+# Vercel
+.vercel
