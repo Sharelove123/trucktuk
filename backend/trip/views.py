@@ -15,7 +15,7 @@ class CalculateTripView(APIView):
             # 1. Geocode locations
             def geocode(addr):
                 url = f"https://nominatim.openstreetmap.org/search?q={addr}&format=json&limit=1"
-                headers = {'User-Agent': 'ELDApp/1.0'}
+                headers = {'User-Agent': 'TruckFlowELD_Assessment_App/1.0 (contact: test@example.com)'}
                 res = requests.get(url, headers=headers).json()
                 if not res:
                     raise Exception(f"Could not find location: {addr}")
@@ -59,4 +59,4 @@ class CalculateTripView(APIView):
             })
             
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": f"Backend Error: {str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
